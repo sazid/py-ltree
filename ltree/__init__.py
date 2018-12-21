@@ -1,2 +1,2 @@
-from _ltree import Ltree                                # noqa
-from _lquery import Lquery, Star                        # noqa
+from ltree._ltree import Ltree  # noqa
+from ltree._lquery import Lquery, Star  # noqa
