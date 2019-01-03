@@ -1,8 +1,6 @@
 from string import ascii_lowercase, ascii_uppercase, digits
 
-import six
-
-from ltree._ltree import Ltree
+from ltree import Ltree
 
 
 class TestInit:
@@ -169,18 +167,6 @@ class TestOps:
 class TestAdapt:
     def test_adapt(self):
         import ltree.pg
-
         ltree.pg.register_adapter()
         import psycopg2.extensions as ext
-
-        def portable_binary_type(input_value):
-            if six.PY2:
-                return six.binary_type(input_value)
-            else:
-                return six.binary_type(input_value, encoding='utf-8')
-
-        # six.binary_type is no good here, since on Python 3
-        # encoding is a mandatory parameter and so it's not portable
-        assert ext.adapt(
-            Ltree('foo.bar.baz')
-        ).getquoted() == portable_binary_type("'foo.bar.baz'")
+        assert ext.adapt(Ltree('foo.bar.baz')).getquoted() == b"'foo.bar.baz'"

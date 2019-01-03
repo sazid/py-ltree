@@ -1,4 +1,4 @@
-from ltree._lquery import Star, Lquery
+from ltree import Star, Lquery
 
 
 class TestStar:

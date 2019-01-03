@@ -3,8 +3,7 @@ import sys
 import psycopg2
 import psycopg2.extensions as ext
 
-from ._ltree import Ltree
-from ._lquery import Lquery
+from ltree import Lquery, Ltree
 
 
 def register_adapter():
