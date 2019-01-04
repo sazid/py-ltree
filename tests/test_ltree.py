@@ -1,4 +1,4 @@
-import string
+from string import ascii_lowercase, ascii_uppercase, digits
 
 from ltree import Ltree
 
@@ -57,8 +57,7 @@ class TestInit:
         assert not t
 
     def test_valid(self):
-        valid = (string.ascii_lowercase + string.ascii_uppercase +
-            string.digits + '_')
+        valid = ascii_lowercase + ascii_uppercase + digits + '_'
         for c in valid:
             t = Ltree(c)
             assert type(t) is Ltree
@@ -170,4 +169,4 @@ class TestAdapt:
         import ltree.pg
         ltree.pg.register_adapter()
         import psycopg2.extensions as ext
-        assert ext.adapt(Ltree('foo.bar.baz')).getquoted() == "'foo.bar.baz'"
+        assert ext.adapt(Ltree('foo.bar.baz')).getquoted() == b"'foo.bar.baz'"

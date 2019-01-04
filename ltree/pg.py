@@ -3,8 +3,7 @@ import sys
 import psycopg2
 import psycopg2.extensions as ext
 
-from ._ltree import Ltree
-from ._lquery import Lquery
+from ltree import Lquery, Ltree
 
 
 def register_adapter():
@@ -25,7 +24,8 @@ def register_ltree(conn_or_curs, globally=False, oid=None, array_oid=None):
         oid = get_oids(conn_or_curs, 'ltree')
         if oid is None or not oid[0]:
             raise psycopg2.ProgrammingError(
-                "ltree type not found in the database.")
+                "ltree type not found in the database."
+            )
         else:
             array_oid = oid[1]
             oid = oid[0]
@@ -72,19 +72,22 @@ def get_oids(conn_or_curs, type_name):
     rv0, rv1 = [], []
 
     # get the oid for the ltree
-    curs.execute("""\
+    curs.execute(
+        """\
         select t.oid, typarray
         from pg_type t join pg_namespace ns
             on typnamespace = ns.oid
         where typname = %s
-        """, (type_name,))
+        """,
+        (type_name,),
+    )
 
     for oids in curs:
         rv0.append(oids[0])
         rv1.append(oids[1])
 
     # revert the status of the connection as before the command
-    if (conn_status != ext.STATUS_IN_TRANSACTION and not conn.autocommit):
+    if conn_status != ext.STATUS_IN_TRANSACTION and not conn.autocommit:
         conn.rollback()
 
     return tuple(rv0), tuple(rv1)

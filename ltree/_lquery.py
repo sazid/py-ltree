@@ -1,6 +1,8 @@
 import re
 from collections import Sequence, namedtuple
 
+import six
+
 re_lquery = re.compile(r'^[a-zA-Z0-9_\|]+$')
 
 
@@ -11,12 +13,15 @@ class Star(namedtuple('Star', 'min max')):
         self = super(Star, cls).__new__(cls, min, max)
         return self
 
-    re_star = re.compile(r'''
+    re_star = re.compile(
+        r'''
         ^ (?:
               (\*)
             | (?: \* \{ (\d+) \} )
             | (?: \* \{ (\d*) , (\d*) \} )
-        ) $''', re.VERBOSE)
+        ) $''',
+        re.VERBOSE,
+    )
 
     @classmethod
     def parse(cls, s):
@@ -38,8 +43,11 @@ class Star(namedtuple('Star', 'min max')):
 
     def merge(self, other):
         min = ((self.min or 0) + (other.min or 0)) or None
-        max = None if (self.max is None or other.max is None) \
+        max = (
+            None
+            if (self.max is None or other.max is None)
             else self.max + other.max
+        )
         return Star(min, max)
 
     def __str__(self):
@@ -60,13 +68,14 @@ class Star(namedtuple('Star', 'min max')):
 
 class Lquery(tuple):
     """Wrapper for the Lquery data type."""
+
     __slots__ = ()
 
     def __new__(cls, *args):
         def _label(s):
             if s is None or s == '':
                 return None
-            if isinstance(s, basestring):
+            if isinstance(s, six.string_types):
                 if re_lquery.match(s):
                     return s
 
@@ -81,10 +90,10 @@ class Lquery(tuple):
         labels = []
 
         for arg in args:
-            if isinstance(arg, basestring):
-                labels += map(_label, arg.split('.'))
+            if isinstance(arg, six.string_types):
+                labels.extend(_label(i) for i in arg.split('.'))
             elif isinstance(arg, Sequence):
-                labels += map(_label, arg)
+                labels.extend(_label(i) for i in arg)
             else:
                 labels.append(_label(arg))
 
@@ -109,10 +118,13 @@ class Lquery(tuple):
     def __eq__(self, other):
         if isinstance(other, Lquery):
             return tuple.__eq__(self, other)
-        elif isinstance(other, basestring):
+        elif isinstance(other, six.string_types):
             return str(self) == other
         else:
             return self.__eq__(Lquery(other))
+
+    def __hash__(self):
+        return hash(self)
 
     def __add__(self, other):
         return Lquery(self, other)
@@ -121,13 +133,17 @@ class Lquery(tuple):
         return Lquery(other, self)
 
     def __repr__(self):
-        return '%s(%r)' % (self.__class__.__name__, '.'.join(map(str, self)))
+        return '%s(%r)' % (
+            self.__class__.__name__,
+            '.'.join(str(i) for i in self),
+        )
 
     def __str__(self):
-        return '.'.join(map(str, self))
+        return str('.'.join(str(i) for i in self))
 
     def __getslice__(self, i, j):
-        return Lquery(tuple.__getslice__(self, i, j))
+        """Python 2 compatibility function."""
+        return self.__getitem__(slice(i, j))
 
     def __getitem__(self, i):
         if not isinstance(i, slice):
