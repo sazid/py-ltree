@@ -11,15 +11,15 @@ def read(fname):
 
 setup(
     name="ltree",
-    version="0.0.4",
+    version="0.0.5",
     author="Daniele Varrazzo",
     author_email="daniele.varrazzo@gmail.com",
-    description="Python wrapper for the PostgreSQL ltree data type",
+    description="Python wrapper for the PostgreSQL ltree data type (using psycopg2-binary)",
     license="BSD",
     keywords="ltree tree database",
     url="https://github.com/dvarrazzo/py-ltree",
     packages=['ltree'],
-    install_requires=['six', 'psycopg2'],
+    install_requires=['six', 'psycopg2-binary'],
     long_description=read('README.rst'),
     classifiers=[
         l.strip()
