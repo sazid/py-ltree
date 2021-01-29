@@ -1,6 +1,9 @@
 Python ltree implementation
 ===========================
 
+**NOTE: This fork uses the `psycopg2-binary` module instead of `psycopg2`
+which needs to be compiled.
+
 ``ltree`` is a sequence of labels that can be used to represent a hierarchical
 tree-like structure. The `PostgreSQL database`__ provides an `ltree data
 type`__ with very powerful indexing functionalities, making it a practical way
